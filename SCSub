@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+
+Import('env')
+Import('env_modules')
+
+env_rml = env_modules.Clone()
+
+module_path = self.Dir('.').abspath
+env_rml.Prepend(CPPPATH=[module_path + 'thirdparty/tinygltf/include'])
+
+env_rml.add_source_files(env.modules_sources, "src/*.cpp")
