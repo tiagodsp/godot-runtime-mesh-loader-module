@@ -52,36 +52,89 @@ Ref<Mesh> GLTFLoader::LoadMesh(std::vector<unsigned char> membuffer) {
 		for (auto &mesh : model.meshes) {
 			for (auto &primitive : mesh.primitives) {
 
-				// VERTEX POSITIONS -------------------
+				// NORMALS --------------------------
+				{
+					int normals_index = primitive.attributes["NORMAL"];
+					const tinygltf::Accessor &acessor = model.accessors[normals_index];
+					tinygltf::BufferView bv = model.bufferViews[acessor.bufferView];
+					std::vector<unsigned char> buffer_data = model.buffers[bv.buffer].data;
+					for (int i = 0; i < acessor.count; i++) {
+						Vector3 vertexNormal;
+						void *ptr = &buffer_data[bv.byteOffset + acessor.byteOffset + (i * 4 * 3)];
+						vertexNormal.x = *(reinterpret_cast<float*>(ptr) + 0);
+						vertexNormal.y = *(reinterpret_cast<float*>(ptr) + 1);
+						vertexNormal.z = *(reinterpret_cast<float*>(ptr) + 2);
+						std::cout << "VERTEX NORMAL [x: " << vertexNormal.x << ", y: " << vertexNormal.y << ", z: " << vertexNormal.z << "]\n";
+						st->add_normal(vertexNormal);
+					}
+				}
+
+				// UV TEX COORDINATES --------------------------
+				{
+					int texcoord_index = primitive.attributes["TEXCOORD_0"];
+					const tinygltf::Accessor &acessor = model.accessors[texcoord_index];
+					tinygltf::BufferView bv = model.bufferViews[acessor.bufferView];
+					std::vector<unsigned char> buffer_data = model.buffers[bv.buffer].data;
+					for (int i = 0; i < acessor.count; i++) {
+						Vector2 texcoord;
+						void *ptr = &buffer_data[bv.byteOffset + acessor.byteOffset + (i * 4 * 2)];
+						texcoord.x = *(reinterpret_cast<float*>(ptr) + 0);
+						texcoord.y = *(reinterpret_cast<float*>(ptr) + 1);
+						std::cout << "TEXTURE COORD [x: " << texcoord.x << ", y: " << texcoord.y << "]\n";
+						st->add_uv(texcoord);
+					}
+				}
+
+				// POSITIONS -------------------
 				{
 					int position_index = primitive.attributes["POSITION"];
-					const tinygltf::Accessor &position_acessor = model.accessors[position_index];
-					tinygltf::BufferView bv = model.bufferViews[position_acessor.bufferView];
+					const tinygltf::Accessor &acessor = model.accessors[position_index];
+					tinygltf::BufferView bv = model.bufferViews[acessor.bufferView];
 					std::vector<unsigned char> buffer_data = model.buffers[bv.buffer].data;
-					for (int i = 0; i < position_acessor.count; i++) {
+					for (int i = 0; i < acessor.count; i++) {
 						Vector3 vertexPosition;
-						void *ptr = &buffer_data[bv.byteOffset + position_acessor.byteOffset + (i * 4 * 3)];
-						vertexPosition.x = *((float *)ptr + 0);
-						vertexPosition.y = *((float *)ptr + 4);
-						vertexPosition.z = *((float *)ptr + 8);
+						void *ptr = &buffer_data[bv.byteOffset + acessor.byteOffset + (i * 4 * 3)];
+						
+						vertexPosition.x = *(reinterpret_cast<float*>(ptr) + 0);
+						vertexPosition.y = *(reinterpret_cast<float*>(ptr) + 1);
+						vertexPosition.z = *(reinterpret_cast<float*>(ptr) + 2);
 						std::cout << "VERTEX POSITION [x: " << vertexPosition.x << ", y: " << vertexPosition.y << ", z: " << vertexPosition.z << "]\n";
 						st->add_vertex(vertexPosition);
 					}
 				}
 
-				// VERTEX INDICES --------------------
+				// INDICES --------------------
 				{
-					const tinygltf::Accessor &indices_acessor = model.accessors[primitive.indices];
-					tinygltf::BufferView bv = model.bufferViews[indices_acessor.bufferView];
-					for (int i = 0; i < indices_acessor.count; i++) {
-						int index = (int)model.buffers[bv.buffer].data[bv.byteOffset + indices_acessor.byteOffset + (i * tinygltf::GetComponentSizeInBytes(indices_acessor.componentType))];
-						std::cout << "VERTEX INDEX [" << index << "]\n";
-						st->add_index(index);
+					const tinygltf::Accessor &acessor = model.accessors[primitive.indices];
+					tinygltf::BufferView bv = model.bufferViews[acessor.bufferView];
+					for (int i = 0; i < acessor.count; i++) {
+						void *ptr;
+						switch (acessor.componentType) {
+							case TINYGLTF_COMPONENT_TYPE_BYTE:
+							case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+								ptr = &model.buffers[bv.buffer].data[bv.byteOffset + acessor.byteOffset + (i * 1)];
+								st->add_index(*(unsigned char *)ptr);
+								break;
+							case TINYGLTF_COMPONENT_TYPE_SHORT:
+							case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+								ptr = &model.buffers[bv.buffer].data[bv.byteOffset + acessor.byteOffset + (i * 2)];
+								st->add_index(*(unsigned short *)ptr);
+								std::cout << "VERTEX INDEX [" << *(unsigned short *)ptr << "]\n";
+								break;
+							case TINYGLTF_COMPONENT_TYPE_INT:
+							case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+							case TINYGLTF_COMPONENT_TYPE_FLOAT:
+								ptr = &model.buffers[bv.buffer].data[bv.byteOffset + acessor.byteOffset + (i * 4)];
+								st->add_index(*(unsigned int *)ptr);
+								break;
+							default:
+								break;
+						}
 					}
 				}
 			}
 		}
-		st->generate_normals();
+		//st->generate_normals();
 		//st->generate_tangents();
 		mesh->add_surface_from_arrays(Mesh::PrimitiveType::PRIMITIVE_TRIANGLES, st->commit_to_arrays());
 	} else {
