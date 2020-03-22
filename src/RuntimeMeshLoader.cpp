@@ -1,44 +1,19 @@
-#include "runtimemeshloader.h"
-
-#include <iostream>
-#include <ifstream>
-#include <vector>
-#include <regex>
-
-#include "tinygltf/tiny_gltf.h"
-
-RuntimeMeshLoader::RuntimeMeshLoader(/* args */)
-{
-}
-
-RuntimeMeshLoader::~RuntimeMeshLoader()
-{
-}
+#include "RuntimeMeshLoader.h"
+#include "core/class_db.h"
+#include "loaders/Loader.h"
+#include <string>
 
 Ref<Mesh> RuntimeMeshLoader::loadMeshFromFile(String filepath)
 {
-	std::vector<unsigned char> filedata;
+	std::wstring ws_filepath = filepath.c_str();
+	std::string s_filepath(ws_filepath.begin(), ws_filepath.end());
+	Loader* loader = Loader::Create(Loader::CheckFileTypeSupport(s_filepath));
+	if(loader)
+		return loader->LoadMesh(s_filepath);
+	return nullptr;
+}
 
-	// read data from file
-	ifstream file(filepath.c_str(), ios::binary);
-	if(file.is_open())
-	{
-		uint64_t size = file.tellg();
-		filedata = std::vector<unsigned char>(size);
-		file.seekg(0);
-		file.read(filedata.data(), size);
-		file.close();
-	}
-
-	switch (CheckFileTypeSupport(filepath))
-	{
-	case RuntimeMeshLoader::FileType::GLTFL
-		return
-	default:
-		return nullptr;
-	}
-
-	// load from buffer
-	if(filedata.size() > 0)
-		return _loadMeshFromByteArray(filedata);
+void RuntimeMeshLoader::_bind_methods()
+{
+	ClassDB::bind_method(D_METHOD("loadMeshFromFile", "filepath"), &RuntimeMeshLoader::loadMeshFromFile);
 }

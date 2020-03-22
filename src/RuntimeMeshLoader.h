@@ -1,12 +1,13 @@
 #pragma once
-
+#include "core/reference.h"
 #include "scene/resources/mesh.h"
 #include <vector>
 
-class RuntimeMeshLoader {
+class RuntimeMeshLoader : public Reference {
+	GDCLASS(RuntimeMeshLoader, Reference);
+protected:
+    static void _bind_methods();
 public:
-	RuntimeMeshLoader();
-	~RuntimeMeshLoader();
-
 	Ref<Mesh> loadMeshFromFile(String filepath);
+	RuntimeMeshLoader(){}
 };

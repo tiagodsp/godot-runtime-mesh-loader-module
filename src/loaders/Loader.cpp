@@ -1,21 +1,38 @@
 #include "Loader.h"
+#include "GLTFLoader.h"
 
-Loader::FileType Loader::CheckFileTypeSupport(std::string filename)
-{
+#include <regex>
+#include <string>
+
+Loader *Loader::Create(FileType type) {
+	switch (type) {
+		case FileType::GLTF:
+			return new GLTFLoader();
+		case FileType::NotSupportedFile:
+			return nullptr;
+		default:
+			return nullptr;
+	}
+}
+
+Loader::FileType Loader::CheckFileTypeSupport(std::string filename) {
 	std::string pattern = "^.*\\.([a-zA-Z]+)$";
-	std::cmatch m;
-	if(std::regex_match(filename, m, std::regex(pattern)))
-	{
-		std::string fileExtension = std::tolower(m[1]);
+	std::smatch m;
 
-		if(
-			fileExtension == "gltf" ||
-			fileExtension == "glb" ||
-		)
-		{
-			return RuntimeMeshLoader::FileType::GLTFL;
+	std::for_each(filename.begin(), filename.end(), [](char &c) {
+		c = std::tolower(c);
+	});
+
+	if (std::regex_match(filename, m, std::regex(pattern))) {
+
+		std::string fileExtension = m[1];
+
+		if (
+				fileExtension == "gltf" ||
+				fileExtension == "glb") {
+			return Loader::FileType::GLTF;
 		}
 
-		return RuntimeMeshLoader::FileType::NotSupportedFile;
+		return Loader::FileType::NotSupportedFile;
 	}
 }
