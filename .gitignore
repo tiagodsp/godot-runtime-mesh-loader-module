@@ -1,4 +1,5 @@
 __pycache__
+*.bc
 
 # Prerequisites
 *.d
@@ -32,3 +33,4 @@ __pycache__
 *.exe
 *.out
 *.app
+
