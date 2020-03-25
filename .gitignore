@@ -9,6 +9,7 @@ __pycache__
 *.lo
 *.o
 *.obj
+*.bc
 
 # Precompiled Headers
 *.gch
