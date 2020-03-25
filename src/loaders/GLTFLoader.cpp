@@ -496,11 +496,6 @@ Ref<Mesh> GLTFLoader::LoadMesh(std::vector<unsigned char> membuffer) {
 		mesharray->add_surface_from_arrays(Mesh::PrimitiveType::PRIMITIVE_TRIANGLES, st->commit_to_arrays());
 		//st->generate_normals();
 		//st->generate_tangents();
-<<<<<<< HEAD
-		std::cout << "Adding mesh surface..." << std::endl;
-		mesh->add_surface_from_arrays(Mesh::PrimitiveType::PRIMITIVE_TRIANGLES, st->commit_to_arrays());
-=======
->>>>>>> b4cbf3642c7e69c48e1f446f47e00c858212f427
 	} else {
 		std::cout << err;
 		std::cout << warn;
