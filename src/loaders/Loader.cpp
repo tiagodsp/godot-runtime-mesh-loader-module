@@ -33,6 +33,6 @@ Loader::FileType Loader::CheckFileTypeSupport(std::string filename) {
 			return Loader::FileType::GLTF;
 		}
 
-		return Loader::FileType::NotSupportedFile;
 	}
+	return Loader::FileType::NotSupportedFile;
 }
