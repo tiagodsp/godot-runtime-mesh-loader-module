@@ -20,7 +20,7 @@ Loader::FileType Loader::CheckFileTypeSupport(std::string filename) {
 	std::smatch m;
 
 	std::for_each(filename.begin(), filename.end(), [](char &c) {
-		c = std::tolower(c);
+		c = ::tolower(c);
 	});
 
 	if (std::regex_match(filename, m, std::regex(pattern))) {
