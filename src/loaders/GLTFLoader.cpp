@@ -65,76 +65,44 @@ Ref<Mesh> GLTFLoader::LoadMesh(std::vector<unsigned char> membuffer) {
 
 				Ref<Image> img;
 				img.instance();
+
+				// TODO: clean this
+				auto printImageSummary = [&](Ref<Image>& img)
+				{
+					std::cout << "Width px: " << img->get_size().width << std::endl;
+					std::cout << "Height px: " << img->get_size().height << std::endl;
+					std::cout << "Size bytes: " << img->get_data().size() << std::endl;
+					std::cout << "Size kbytes: " << img->get_data().size() / 1024.0f << std::endl;
+					std::cout << "Size mbytes: " << img->get_data().size() / 1024.0f / 1024.0f << std::endl;
+					std::cout << "Format: " << img->get_format() << std::endl;
+				};
+				auto compressImageToDXT1 = [&](Ref<Image>& img)
+				{
+					// Convert image to DXT1 format
+					//img->compress(Image::CompressMode::COMPRESS_S3TC, Image::CompressSource::COMPRESS_SOURCE_GENERIC);
+					std::cout << std::endl << "Post-compress:" << std::endl;
+					printImageSummary(img);
+
+					// Decompress and convert to RGBA8
+					img->decompress();
+					img->convert(Image::Format::FORMAT_RGBA8);
+
+					Ref<Image> _tci;
+					_tci.instance();
+					TextureUtils::ConvertRGBA8ToDXT(&_tci, img);
+					img = _tci;
+					
+					std::cout << std::endl << "Post-compress:" << std::endl;
+					printImageSummary(img);
+				};
+
+				// Load and compress image to DXT1 image format
 				if (tg_img.mimeType.compare("image/jpeg") == 0) {
-					// TODO - Load raw images and compress it to DXT here!
 					img->load_jpg_from_buffer(b);
-					{
-						std::cout << std::endl;
-						std::cout << "Pre-compress:" << std::endl;
-						std::cout << "Width px: " << img->get_size().width << std::endl;
-						std::cout << "Height px: " << img->get_size().height << std::endl;
-						std::cout << "Size bytes: " << img->get_data().size() << std::endl;
-						std::cout << "Size kbytes: " << img->get_data().size() / 1024.0f << std::endl;
-						std::cout << "Size mbytes: " << img->get_data().size() / 1024.0f / 1024.0f << std::endl;
-						std::cout << "Format: " << img->get_format() << std::endl;
-					}
-					// Convert image to DXT1 format
-					img->decompress();
-					img->convert(Image::Format::FORMAT_RGBA8);
-					{
-						Ref<Image> _tci;
-						_tci.instance();
-
-						TextureUtils::ConvertRGBA8ToDXT(&_tci, img);
-						img = _tci;
-					}
-					//img->compress(Image::CompressMode::COMPRESS_S3TC, Image::CompressSource::COMPRESS_SOURCE_GENERIC);
-					{
-
-						std::cout << std::endl;
-						std::cout << "Post-compress:" << std::endl;
-						std::cout << "Width px: " << img->get_size().width << std::endl;
-						std::cout << "Height px: " << img->get_size().height << std::endl;
-						std::cout << "Size bytes: " << img->get_data().size() << std::endl;
-						std::cout << "Size kbytes: " << img->get_data().size() / 1024.0f << std::endl;
-						std::cout << "Size mbytes: " << img->get_data().size() / 1024.0f / 1024.0f << std::endl;
-						std::cout << "Format: " << img->get_format() << std::endl;
-					}
+					compressImageToDXT1(img);
 				} else if (tg_img.mimeType.compare("image/png") == 0) {
-					// TODO - Load raw images and compress it to DXT here!
 					img->load_png_from_buffer(b);
-					{
-						std::cout << std::endl;
-						std::cout << "Pre-compress:" << std::endl;
-						std::cout << "Width px: " << img->get_size().width << std::endl;
-						std::cout << "Height px: " << img->get_size().height << std::endl;
-						std::cout << "Size bytes: " << img->get_data().size() << std::endl;
-						std::cout << "Size kbytes: " << img->get_data().size() / 1024.0f << std::endl;
-						std::cout << "Size mbytes: " << img->get_data().size() / 1024.0f / 1024.0f << std::endl;
-						std::cout << "Format: " << img->get_format() << std::endl;
-					}
-					// Convert image to DXT1 format
-					img->decompress();
-					img->convert(Image::Format::FORMAT_RGBA8);
-					{
-						Ref<Image> _tci;
-						_tci.instance();
-
-						TextureUtils::ConvertRGBA8ToDXT(&_tci, img);
-						img = _tci;
-					}
-					//img->compress(Image::CompressMode::COMPRESS_S3TC, Image::CompressSource::COMPRESS_SOURCE_GENERIC);
-					{
-
-						std::cout << std::endl;
-						std::cout << "Post-compress:" << std::endl;
-						std::cout << "Width px: " << img->get_size().width << std::endl;
-						std::cout << "Height px: " << img->get_size().height << std::endl;
-						std::cout << "Size bytes: " << img->get_data().size() << std::endl;
-						std::cout << "Size kbytes: " << img->get_data().size() / 1024.0f << std::endl;
-						std::cout << "Size mbytes: " << img->get_data().size() / 1024.0f / 1024.0f << std::endl;
-						std::cout << "Format: " << img->get_format() << std::endl;
-					}
+					compressImageToDXT1(img);
 				} else {
 					ERR_PRINT("Failed to load texture: mimeType not supported.");
 					continue;
