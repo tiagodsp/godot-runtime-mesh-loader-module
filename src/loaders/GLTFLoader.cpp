@@ -8,6 +8,7 @@
 
 #include "core/array.h"
 
+#include "TextureUtils.h"
 #include "tinygltf/tiny_gltf.h"
 
 Ref<Mesh> GLTFLoader::LoadMesh(std::string filepath) {
@@ -67,9 +68,73 @@ Ref<Mesh> GLTFLoader::LoadMesh(std::vector<unsigned char> membuffer) {
 				if (tg_img.mimeType.compare("image/jpeg") == 0) {
 					// TODO - Load raw images and compress it to DXT here!
 					img->load_jpg_from_buffer(b);
+					{
+						std::cout << std::endl;
+						std::cout << "Pre-compress:" << std::endl;
+						std::cout << "Width px: " << img->get_size().width << std::endl;
+						std::cout << "Height px: " << img->get_size().height << std::endl;
+						std::cout << "Size bytes: " << img->get_data().size() << std::endl;
+						std::cout << "Size kbytes: " << img->get_data().size() / 1024.0f << std::endl;
+						std::cout << "Size mbytes: " << img->get_data().size() / 1024.0f / 1024.0f << std::endl;
+						std::cout << "Format: " << img->get_format() << std::endl;
+					}
+					// Convert image to DXT1 format
+					img->decompress();
+					img->convert(Image::Format::FORMAT_RGBA8);
+					{
+						Ref<Image> _tci;
+						_tci.instance();
+
+						TextureUtils::ConvertRGBA8ToDXT(&_tci, img);
+						img = _tci;
+					}
+					//img->compress(Image::CompressMode::COMPRESS_S3TC, Image::CompressSource::COMPRESS_SOURCE_GENERIC);
+					{
+
+						std::cout << std::endl;
+						std::cout << "Post-compress:" << std::endl;
+						std::cout << "Width px: " << img->get_size().width << std::endl;
+						std::cout << "Height px: " << img->get_size().height << std::endl;
+						std::cout << "Size bytes: " << img->get_data().size() << std::endl;
+						std::cout << "Size kbytes: " << img->get_data().size() / 1024.0f << std::endl;
+						std::cout << "Size mbytes: " << img->get_data().size() / 1024.0f / 1024.0f << std::endl;
+						std::cout << "Format: " << img->get_format() << std::endl;
+					}
 				} else if (tg_img.mimeType.compare("image/png") == 0) {
 					// TODO - Load raw images and compress it to DXT here!
 					img->load_png_from_buffer(b);
+					{
+						std::cout << std::endl;
+						std::cout << "Pre-compress:" << std::endl;
+						std::cout << "Width px: " << img->get_size().width << std::endl;
+						std::cout << "Height px: " << img->get_size().height << std::endl;
+						std::cout << "Size bytes: " << img->get_data().size() << std::endl;
+						std::cout << "Size kbytes: " << img->get_data().size() / 1024.0f << std::endl;
+						std::cout << "Size mbytes: " << img->get_data().size() / 1024.0f / 1024.0f << std::endl;
+						std::cout << "Format: " << img->get_format() << std::endl;
+					}
+					// Convert image to DXT1 format
+					img->decompress();
+					img->convert(Image::Format::FORMAT_RGBA8);
+					{
+						Ref<Image> _tci;
+						_tci.instance();
+
+						TextureUtils::ConvertRGBA8ToDXT(&_tci, img);
+						img = _tci;
+					}
+					//img->compress(Image::CompressMode::COMPRESS_S3TC, Image::CompressSource::COMPRESS_SOURCE_GENERIC);
+					{
+
+						std::cout << std::endl;
+						std::cout << "Post-compress:" << std::endl;
+						std::cout << "Width px: " << img->get_size().width << std::endl;
+						std::cout << "Height px: " << img->get_size().height << std::endl;
+						std::cout << "Size bytes: " << img->get_data().size() << std::endl;
+						std::cout << "Size kbytes: " << img->get_data().size() / 1024.0f << std::endl;
+						std::cout << "Size mbytes: " << img->get_data().size() / 1024.0f / 1024.0f << std::endl;
+						std::cout << "Format: " << img->get_format() << std::endl;
+					}
 				} else {
 					ERR_PRINT("Failed to load texture: mimeType not supported.");
 					continue;
@@ -190,7 +255,7 @@ Ref<Mesh> GLTFLoader::LoadMesh(std::vector<unsigned char> membuffer) {
 							unsigned int mask = (0xFFFFFFFF >> (32 - 8 * tinygltf::GetComponentSizeInBytes(acessor.componentType)));
 							//std::cout << "MASK [" << mask << "]\n";
 							for (int i = 0; i < tinygltf::GetNumComponentsInType(acessor.type); i++) {
-								vertexPosition.coord[i] = *(reinterpret_cast<float *>(ptr) + i) & mask;
+								vertexPosition.coord[i] = *(reinterpret_cast<float *>(ptr) + i);
 							}
 							//std::cout << vi << " - VERTEX POSITION [x: " << vertexPosition.x << ", y: " << vertexPosition.y << ", z: " << vertexPosition.z << "]\n";
 							st->add_vertex(vertexPosition);

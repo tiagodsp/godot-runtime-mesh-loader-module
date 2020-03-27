@@ -5,14 +5,17 @@ Import('env_modules')
 
 env_rml = env_modules.Clone()
 
-env_rml['PDB'] = "rml.pdb"
-
+# TinyGLTF definitions
 env_rml.Append(CPPDEFINES=['TINYGLTF_NO_FS'])
 env_rml.Append(CPPDEFINES=['TINYGLTF_IMPLEMENTATION'])
 env_rml.Append(CPPDEFINES=['STB_IMAGE_IMPLEMENTATION'])
 env_rml.Append(CPPDEFINES=['STB_IMAGE_WRITE_IMPLEMENTATION'])
 
+# RygsDXTc definitions
+env_rml.Append(CPPDEFINES=['STB_DXT_IMPLEMENTATION'])
+
 env_rml.Prepend(CPPPATH=['thirdparty/tinygltf/include'])
+env_rml.Prepend(CPPPATH=['thirdparty/RygsDXTc/include'])
 env_rml.Prepend(CPPPATH=['src'])
 
 env_rml.add_source_files(env.modules_sources, "*.cpp")
