@@ -16,6 +16,7 @@ class Loader {
 public:
 	static Loader* Create(FileType type);
 	static Loader::FileType CheckFileTypeSupport(std::string filename);
+	static std::string GetFileExtension(std::string filename);
 
 	virtual Ref<Mesh> LoadMesh(std::vector<unsigned char> membuffer) = 0;
 	virtual Ref<Mesh> LoadMesh(std::string filepath) = 0;

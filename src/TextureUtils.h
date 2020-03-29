@@ -4,5 +4,5 @@
 class TextureUtils
 {
     public:
-        static bool ConvertRGBA8ToDXT(Ref<Image> *destination, const Ref<Image>& source);
+        static bool ConvertRGBA8ToDXT(Ref<Image> destination, const Ref<Image> source);
 };

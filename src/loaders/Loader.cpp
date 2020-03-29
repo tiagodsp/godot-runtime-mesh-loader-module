@@ -16,6 +16,18 @@ Loader *Loader::Create(FileType type) {
 }
 
 Loader::FileType Loader::CheckFileTypeSupport(std::string filename) {
+	std::string fileExtension = GetFileExtension(filename);
+
+	if (
+			fileExtension == "gltf" ||
+			fileExtension == "glb") {
+		return Loader::FileType::GLTF;
+	}
+
+	return Loader::FileType::NotSupportedFile;
+}
+
+std::string Loader::GetFileExtension(std::string filename) {
 	std::string pattern = "^.*\\.([a-zA-Z]+)$";
 	std::smatch m;
 
@@ -24,15 +36,8 @@ Loader::FileType Loader::CheckFileTypeSupport(std::string filename) {
 	});
 
 	if (std::regex_match(filename, m, std::regex(pattern))) {
-
-		std::string fileExtension = m[1];
-
-		if (
-				fileExtension == "gltf" ||
-				fileExtension == "glb") {
-			return Loader::FileType::GLTF;
-		}
-
+		return m[1];
+	} else {
+		return "";
 	}
-	return Loader::FileType::NotSupportedFile;
 }
